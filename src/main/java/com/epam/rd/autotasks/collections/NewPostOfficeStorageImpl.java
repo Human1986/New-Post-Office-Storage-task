@@ -2,11 +2,10 @@ package com.epam.rd.autotasks.collections;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class NewPostOfficeStorageImpl implements NewPostOfficeStorage {
-    private List<Box> parcels;
+    private final List<Box> parcels;
 
     /**
      * Creates internal storage for becoming parcels
@@ -24,59 +23,109 @@ public class NewPostOfficeStorageImpl implements NewPostOfficeStorage {
      *                              or contains {@code null} values.
      */
     public NewPostOfficeStorageImpl(Collection<Box> boxes) {
-        // place your code here
+        parcels = new ArrayList<>();
+        for (Box box : boxes) {
+            if (box == null) throw new NullPointerException();
+            parcels.add(box);
+        }
     }
 
     @Override
     public boolean acceptBox(Box box) {
-        // place your code here
-        return false;
+        if (box == null) throw new NullPointerException();
+        parcels.add(box);
+        return true;
     }
 
     @Override
     public boolean acceptAllBoxes(Collection<Box> boxes) {
-        // place your code here
-        return false;
+        for (Box box : boxes) {
+            if (box == null) {
+                throw new NullPointerException();
+            }
+            parcels.add(box);
+        }
+        return true;
     }
 
     @Override
     public boolean carryOutBoxes(Collection<Box> boxes) {
-        // place your code here
-        return false;
+        for (Box box : boxes) {
+            if (box == null) throw new NullPointerException();
+        }
+
+        return parcels.removeAll(boxes);
     }
 
     @Override
     public List<Box> carryOutBoxes(Predicate<Box> predicate) {
-        // place your code here
-        return null;
+        if (predicate == null) throw new NullPointerException();
+        List<Box> deleteBoxes = new ArrayList<>();
+
+        Iterator<Box> iterator = parcels.iterator();
+
+        while (iterator.hasNext()) {
+            Box box = iterator.next();
+            if (predicate.test(box)) {
+                deleteBoxes.add(box);
+                iterator.remove();
+            }
+        }
+        return deleteBoxes;
     }
 
     @Override
     public List<Box> getAllWeightLessThan(double weight) {
-        // place your code here
-        return null;
+        if (weight <= 0) throw new IllegalArgumentException();
+        return searchBoxes(new Predicate<Box>() {
+            @Override
+            public boolean test(Box box) {
+                return box.getWeight() < weight;
+            }
+        });
+
     }
 
     @Override
     public List<Box> getAllCostGreaterThan(BigDecimal cost) {
-        // place your code here
-        return null;
+        if (cost.doubleValue() < 0) throw new IllegalArgumentException();
+
+        return searchBoxes(new Predicate<Box>() {
+            @Override
+            public boolean test(Box box) {
+                return box.getCost().compareTo(cost) > 0;
+            }
+        });
     }
 
     @Override
     public List<Box> getAllVolumeGreaterOrEqual(double volume) {
-        // place your code here
-        return null;
+        if (volume < 0) throw new IllegalArgumentException();
+        return searchBoxes(new Predicate<Box>() {
+            @Override
+            public boolean test(Box box) {
+                return box.getVolume() >= volume;
+            }
+        });
     }
 
     @Override
     public List<Box> searchBoxes(Predicate<Box> predicate) {
-        // place your code here
-        return null;
+        List<Box> boxes = new ArrayList<>();
+        for (Box parcel : parcels) {
+            if (predicate.test(parcel)) {
+                boxes.add(parcel);
+            }
+        }
+        return boxes;
     }
 
     @Override
     public void updateOfficeNumber(Predicate<Box> predicate, int newOfficeNumber) {
-        // place your code here
+        for (Box parcel : parcels) {
+            if (predicate.test(parcel)) {
+                parcel.setOfficeNumber(newOfficeNumber);
+            }
+        }
     }
 }

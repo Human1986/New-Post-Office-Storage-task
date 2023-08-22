@@ -78,6 +78,7 @@ public class Box implements Cloneable {
                 Objects.equals(city, box.city);
     }
 
+
     @Override
     public int hashCode() {
         return Objects.hash(addresser, recipient, weight, volume, cost, city, officeNumber);
